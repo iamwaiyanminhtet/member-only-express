@@ -1,8 +1,10 @@
-const asyncHandler = require("async-handler")
+const asyncHandler = require('express-async-handler')
 const { body, validationResult } = require("express-validator")
 const bcrypt = require('bcryptjs')
 
 const User = require('../models/userModel');
+const passport = require('./loginStrategy');
+const { ObjectId } = require("mongodb");
 
 const signupPage = (req,res) => {
     res.render('sign-up', {error : {}})
@@ -25,7 +27,7 @@ const signUpValidation = [
     }),
 ]
 
-const signup = async (req,res) => {
+const signup = asyncHandler(async (req,res) => {
     const error = validationResult(req)
     if(error.isEmpty()){
         bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {
@@ -43,15 +45,53 @@ const signup = async (req,res) => {
     }else {
         res.render('sign-up', {error : error.errors[0]})
     }
-}
+})
 
-const login = (req,res) => {
+const loginPage = (req,res) => {
     res.render('login')
 } 
+
+const passportAuth = passport.authenticate('local', {
+    successRedirect : '/',
+    failureRedirect : '/login'
+})
+
+const logout = (req, res) => {
+    req.logOut((err) => {
+      if(err) console.log(err)
+      res.redirect('/')
+    })
+};
+
+const joinMember = asyncHandler(async (req, res) => {
+    if(ObjectId.isValid(req.params.id)) {
+        await User.findByIdAndUpdate(
+            new ObjectId(req.params.id), 
+            { $set : {member : true}}
+        )
+        res.redirect('/')
+    }
+})
+
+const becomeAdmin =asyncHandler(async  (req,res) => {
+    if(req.body.admin === "admin") {
+        await User.findByIdAndUpdate(
+            new ObjectId(req.params.id), 
+            { $set : {admin : true}}
+        )
+        res.redirect('/')
+    } else {
+        res.redirect('/')
+    }
+});
 
 module.exports = {
     signupPage,
     signup,
     signUpValidation,
-    login
+    loginPage,
+    passportAuth,
+    logout,
+    joinMember,
+    becomeAdmin
 }

@@ -4,15 +4,42 @@
     <title>Member Only</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <style>
-      a {
+      body > a {
         font-size:  1.5rem;
       }
     </style>
   </head>
   <body>
     <h1>Member Only</h1>
+
+    <% if (user) {%>
+      <h3>WELCOME BACK <%= user.username.toUpperCase() %></h3>
+      <% if (user.member) { %>
+       <p>Member Status - Already a member</p>
+      <% } else {%>
+        <p>Member Status - not yet 
+          <a href="/join-member/<%= user._id%>">Join</a>
+        </p>
+      <% } %>
+
+      <% if (user.admin) { %>
+        <p>Admin Status - You are admin</p>
+       <% } else {%>
+        <div style="display: flex; align-items: center;">
+          <p>Admin Status -  &nbsp;</p>
+          <form action="/become-admin/<%= user._id%>" method="post">
+            <input type="text" name="admin">
+            <button type="submit">Become An Admin</button>
+          </form>
+        </div>
+       <% } %>
+
+      <a href="/log-out">Log out</a>
+    <% } else {%>
     <a href="/sign-up">Sign Up</a>
     <br>
     <a href="/login">Login</a>
+    <br>
+    <% } %>
   </body>
 </html>
