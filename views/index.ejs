@@ -18,7 +18,7 @@
        <p>Member Status - Already a member</p>
       <% } else {%>
         <p>Member Status - not yet 
-          <a href="/join-member/<%= user._id%>">Join</a>
+          <a href="/join-member/<%= user._id%>">Join?</a>
         </p>
       <% } %>
 
@@ -33,13 +33,36 @@
           </form>
         </div>
        <% } %>
+    
+       <a href="/create-message">Create Message</a>
 
       <a href="/log-out">Log out</a>
+
+     
     <% } else {%>
     <a href="/sign-up">Sign Up</a>
     <br>
     <a href="/login">Login</a>
     <br>
     <% } %>
+
+    <div>
+      <% if (messages.length > 0) { %>
+       <% messages.forEach(message => { %>
+        <p>Title - <%= message.title %></p>
+        <p>Message - <%= message.message %></p>
+        <% if (user?.member) { %>
+          <p>CreateAt - <%= message.createdAt %></p>
+          <h4>User - <%= message.userId.username %></h4>
+        <% } %>
+        <% if (user?.admin) { %>
+         <form action="/delete-message/<%= message._id %>" method="post">
+          <button type="submit">Delete</button>
+         </form>
+        <% } %>
+        <hr>
+       <% }) %>
+      <% } %>
+    </div>
   </body>
 </html>

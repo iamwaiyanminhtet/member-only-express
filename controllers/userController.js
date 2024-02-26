@@ -40,7 +40,7 @@ const signup = asyncHandler(async (req,res) => {
                 member : false,
                 admin : false
             });
-            res.redirect('/')
+            res.redirect('/login')
           });
     }else {
         res.render('sign-up', {error : error.errors[0]})
